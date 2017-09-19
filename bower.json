@@ -15,7 +15,11 @@
     "paper-icon-button": "PolymerElements/paper-icon-button#^2.0.0",
     "polymer": "Polymer/polymer#^2.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
-    "firebase": "^4.3.1"
+    "firebase": "^4.3.1",
+    "paper-input": "polymerelements/paper-input#^2.0.2",
+    "paper-button": "polymerelements/paper-button#^2.0.0",
+    "moment-element": "abdonrd/moment-element#^3.0.0",
+    "datetime-picker": "fooloomanzoo/datetime-picker#^2.1.6"
   },
   "resolutions": {
     "polymer": "^2.0.0"

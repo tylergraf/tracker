@@ -1,0 +1,96 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymer/lib/utils/debounce.html">
+<link rel="import" href="../bower_components/moment-element/moment-element.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/datetime-picker/datetime-picker.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="tracker-view">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+    </style>
+    <app-location route="{{route}}" url-space-regex="^[[rootPath]]"></app-location>
+    <app-route
+        route="{{route}}"
+        pattern="/tracker-view/:id"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+
+    <div class="">
+      <h1>[[tracker.title]]</h1>
+      <ul>
+        <template is="dom-repeat" items="[[tracks]]" id="tracksRepeater">
+          <li on-click="remove"><moment-element datetime="[[item.date]]" output-format="ll" output="{{item.d}}">[[item.d]]</moment-element>: [[item.value]]</li>
+        </template>
+      </ul>
+    </div>
+
+    <datetime-picker value="{{trackDate}}"></datetime-picker>
+    <paper-input value="{{trackValue}}" label="Value"></paper-input>
+    <paper-button on-click="createTrack">Create</paper-button>
+  </template>
+
+  <script>
+    class TrackerView extends Polymer.Element {
+      static get is() { return 'tracker-view'; }
+      static get observers() {
+        return [
+          'routeChanged(routeData.id)'
+        ]
+      }
+      remove(evt){
+        const item = this.$.tracksRepeater.itemForElement(evt.target)
+        const index = this.$.tracksRepeater.indexForElement(evt.target)
+
+        this.splice('tracks',index,1);
+
+        services.trackService.remove(item._id)
+          .catch(_=>{
+            this.splice('tracks',index,0,item);
+          });
+      }
+      createTrack(){
+        var date = new Date(this.trackDate) || new Date();
+        services.trackService.create({value: parseInt(this.trackValue), _tracker: this.tracker._id, date})
+          .then(track=>{
+            this.push('tracks',track);
+            this.trackValue = '';
+          });
+      }
+      trackerIdHandler(id){
+        services.trackerService.get(id)
+          .then(tracker=>{
+            this.tracker = tracker;
+          });
+        services.trackService.getAll(id)
+          .then(tracks=>{
+            this.tracks = tracks;
+          });
+      }
+      routeChanged(id){
+        this._debouncer = Polymer.Debouncer.debounce(this._debouncer,
+          Polymer.Async.timeOut.after(100),
+          function(){
+            this.el.trackerIdHandler(this.id);
+          }.bind({el:this,id}));
+      }
+    }
+    window.customElements.define(TrackerView.is, TrackerView);
+  </script>
+</dom-module>
