@@ -35,7 +35,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <div class="">
       <h1>[[tracker.title]]</h1>
       <ul>
-        <template is="dom-repeat" items="[[tracks]]" id="tracksRepeater">
+        <template is="dom-repeat" items="[[tracks]]" id="tracksRepeater" sort="sortTracks">
           <li on-click="remove"><moment-element datetime="[[item.date]]" output-format="ll" output="{{item.d}}">[[item.d]]</moment-element>: [[item.value]]</li>
         </template>
       </ul>
@@ -53,6 +53,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return [
           'routeChanged(routeData.id)'
         ]
+      }
+      sortTracks(a,b){
+        return a.date > b.date;
       }
       remove(evt){
         const item = this.$.tracksRepeater.itemForElement(evt.target)
