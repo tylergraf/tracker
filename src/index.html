@@ -60,7 +60,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <meta name="msapplication-tap-highlight" content="no">
 
     <script>
-      const API_BASE = 'http://localhost:3000/api'
+      // const API_BASE = 'http://localhost:3000/api'
+      const API_BASE = 'https://trackershiz-api.herokuapp.com/api'
       /**
       * [polymer-root-path]
       *
@@ -101,6 +102,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         messagingSenderId: "562905632484"
       };
       const FB = firebase.initializeApp(config);
+
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          console.log(user)
+          // User is signed in.
+        } else {
+          // No user is signed in.
+        }
+      });
+
+      function signIn(){
+        var provider = new firebase.auth.TwitterAuthProvider();
+        firebase.auth().signInWithRedirect(provider);
+      }
   </script>
     <script src="src/services/services.js"></script>
     <!-- Load your application shell -->
